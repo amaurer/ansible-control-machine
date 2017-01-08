@@ -1,0 +1,21 @@
+---
+
+- hosts: all
+
+
+  pre_tasks:
+    
+    - name: Install SSH Key
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+
+  roles:
+    - { role: amaurer.control-kickstart }
+
+
+  tasks:
+    - name: Debug something
+      debug: msg=Hello
