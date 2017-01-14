@@ -1,0 +1,22 @@
+---
+
+- hosts: all
+
+  vars:
+    docker_service_name: dd-agent
+
+  tasks:
+
+    - name: Run Datadog Agent
+      shell: docker run -d --name dd-agent -v /var/run/docker.sock:/var/run/docker.sock:ro -v /proc/:/host/proc/:ro -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro -e API_KEY=8ab250b328cf154f2e3847f27be3242f datadog/docker-dd-agent:latest
+      ignore_errors: true
+
+    - name: Create Systemd start
+      template: src=templates/docker-service-init.service.j2 dest=/etc/systemd/system/{{ docker_service_name }}.service
+
+    - name: Enable Services
+      systemd:
+        name: dd-agent
+        daemon_reload: yes
+        state: started
+        enabled: true
